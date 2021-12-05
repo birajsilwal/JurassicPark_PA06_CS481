@@ -11,6 +11,44 @@ int MAXPERCAR;
 int CARNUM;
 const int MAXWAITPEOPLE = 800;
 
+
+int * getHourMinuteSec(long startTime, long currentTime) {
+	float time_passed;
+	long totalMinutes;
+	int hours;
+	int minutes;
+	int seconds;
+	int hoursMinsSecs[3];
+	
+	time_passed = startTime - currentTime;
+	totalMinutes = (time_passed * 1000) / 10; //convert to milliseconds and then convert to minutes
+        hours = totalMinutes / 60; 
+        minutes = totalMinutes % 60; 
+        seconds = 0;
+        
+        hoursMinsSecs = {hours, minutes, seconds};
+        
+        return hoursMinsSecs;
+
+}
+
+/** @param int hour
+ * @return random number of people  
+ * returns randomly generated number of people who will arrive in the give hour 
+ * time is between 9:00am - 7:00pm
+*/ 
+int getNumberOfArrival(int hour){
+	int meanArrival;
+	
+	if(hour >= 9 && hour < 11) { meanArrival = 25; } 
+	else if(hour >= 11 && hour < 14) { meanArrival = 45; } 
+	else if(hour >= 14 && hour < 16) { meanArrival = 35; } 
+	else if(hour >= 16 && hour < 19) { meanArrival = 25; }
+	
+	return poissonRandom(meanArrival);
+}
+
+
 int main(int argc, char *argv[]) {
 
 	int carnum;
@@ -58,42 +96,4 @@ int main(int argc, char *argv[]) {
 	}
 
     
-}
-
-
-int * getHourMinuteSec(long startTime, long currentTime) {
-	float time_passed;
-	long totalMinutes;
-	int hours;
-	int minutes;
-	int seconds;
-	int hoursMinsSecs[3];
-	
-	time_passed = startTime - currentTime;
-	totalMinutes = (time_passed * 1000) / 10; //convert to milliseconds and then convert to minutes
-        hours = totalMinutes / 60; 
-        minutes = totalMinutes % 60; 
-        seconds = 0;
-        
-        hoursMinsSecs = {hours, minutes, seconds};
-        
-        return hoursMinsSecs;
-
-}
-
-
-int getMeanArrival(int hour){
-	int meanArrival;
-	
-	if(hour >= 9 && hour < 11){
-		meanArrival = 25;
-	}else if(hour >= 11 && hour < 14){
-		meanArrival = 45;
-	}else if(hour >= 14 && hour < 16){
-		meanArrival = 35;
-	}else{
-		meanArrival = 25;
-	}
-	
-	return meanArrival;
 }
