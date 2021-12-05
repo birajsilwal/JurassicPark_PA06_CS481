@@ -10,7 +10,7 @@ int getMeanArrival(int hour);
 int MAXPERCAR;
 int CARNUM;
 const int MAXWAITPEOPLE = 800;
-
+int waitingArea[MAXWAITPEOPLE];
 
 int * getHourMinuteSec(long startTime, long currentTime) {
 	float time_passed;
@@ -32,14 +32,15 @@ int * getHourMinuteSec(long startTime, long currentTime) {
 
 }
 
-/** @param int hour
+/** 
+ * @param int hour
  * @return random number of people  
  * returns randomly generated number of people who will arrive in the give hour 
  * time is between 9:00am - 7:00pm
 */ 
 int getNumberOfArrival(int hour){
-	int meanArrival;
-	
+	int meanArrival = 0;
+
 	if(hour >= 9 && hour < 11) { meanArrival = 25; } 
 	else if(hour >= 11 && hour < 14) { meanArrival = 45; } 
 	else if(hour >= 14 && hour < 16) { meanArrival = 35; } 
@@ -47,6 +48,28 @@ int getNumberOfArrival(int hour){
 	
 	return poissonRandom(meanArrival);
 }
+
+/**
+ * Initialize the waiting area array.
+ * initially the waiting time none.
+ */
+void initiateWaitingArea() {
+	for (int i = 0; i < MAXWAITPEOPLE; i++) {
+		waitingArea[i] = 0;
+	}
+}	
+
+/**
+ * increases waiting time. 
+ */
+void increseWaitingTime() {
+	for (int i = 0; i < MAXWAITPEOPLE; i++) {
+		if (waitingArea[i] == 0) {
+			waitingArea[i]++;
+		}
+	} 
+}
+
 
 
 int main(int argc, char *argv[]) {
