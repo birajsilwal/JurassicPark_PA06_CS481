@@ -1,6 +1,7 @@
 #include "random437.h"
 #include <pthread.h>
 #include <sys/types.h>
+#include <getopt.h>
 #include <time.h>
 
 int * getHourMinuteSec(long startTime, long currentTime);
@@ -10,13 +11,27 @@ int MAXPERCAR;
 int CARNUM;
 const int MAXWAITPEOPLE = 800;
 
+int main(int argc, char *argv[]) {
 
+	int carnum;
+	int maxpercar;
+	int opt;
 
-int main(int argc, char *argv[]){
-
-	// Take Input Args	
-	MAXPERCAR = argv[2];
-	CARNUM = argv[4];
+	// handling user command line argument using getopt
+  while((opt = getopt(argc, argv, "N:M:")) != -1) {
+    switch(opt){
+      case 'N':
+        carnum = atoi(optarg);
+        break;
+      case 'M':
+        maxpercar = atoi(optarg);
+        break;
+      default:
+        printf("Incorrect Flags\n");
+        return(-1);
+    }
+  }
+	
 	
 	struct
 	
@@ -46,7 +61,7 @@ int main(int argc, char *argv[]){
 }
 
 
-int * getHourMinuteSec(long startTime, long currentTime){
+int * getHourMinuteSec(long startTime, long currentTime) {
 	float time_passed;
 	long totalMinutes;
 	int hours;
@@ -60,7 +75,7 @@ int * getHourMinuteSec(long startTime, long currentTime){
         minutes = totalMinutes % 60; 
         seconds = 0;
         
-        hoursMinsSecs = {hours, minutes seconds};
+        hoursMinsSecs = {hours, minutes, seconds};
         
         return hoursMinsSecs;
 
