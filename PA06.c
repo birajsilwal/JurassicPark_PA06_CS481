@@ -67,18 +67,18 @@ int * getHourMinuteSec(long startTime, long currentTime){
 }
 
 
-int getMeanArrival(int hour){
+int genArrivals(int timestep){
 	int meanArrival;
 	
-	if(hour >= 9 && hour < 11){
+	if(timestep < 119){
 		meanArrival = 25;
-	}else if(hour >= 11 && hour < 14){
+	}else if(timestep >= 120 && timestep < 299){
 		meanArrival = 45;
-	}else if(hour >= 14 && hour < 16){
+	}else if(timestep >= 300 && timestep < 419){
 		meanArrival = 35;
 	}else{
 		meanArrival = 25;
 	}
 	
-	return meanArrival;
+	return poissonRandom(meanArrival);
 }
