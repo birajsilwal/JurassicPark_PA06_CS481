@@ -10,7 +10,27 @@ int MAXPERCAR;
 int CARNUM;
 int numCarsAvailable;
 const int MAXWAITPEOPLE = 800;
+int waitingSpace[800];
+int totalWaitingTime = 0;
+pthread_mutex_t mutex;
 
+
+void getTimeString(int currentTime){
+	
+	sec = 0;
+	min = currentTime % 60;
+	hr = 9 + currentTime/60;
+	
+	timeInfo.tm_sec = sec;
+	timeInfo.tm_min = min;
+	timeInfo.tm_hour = hr;
+
+	strftime(buffer,10, "%H:%M:%S", &timeInfo);
+	for(int i =0; i<8;i++){
+		timeString[i] = buffer[i];
+	}
+	timeString[8] = '\0';
+}
 
 
 int main(int argc, char *argv[]){
@@ -19,9 +39,6 @@ int main(int argc, char *argv[]){
 	MAXPERCAR = argv[2];
 	CARNUM = argv[4];
 	
-	struct
-	
-	time_t startTime;
 	pthread_t tid;
 	int hours, minutes, seconds;
 	int hoursMinutesSecs[3];
@@ -30,7 +47,14 @@ int main(int argc, char *argv[]){
 	int num_passengers;
 	
 	numCarsAvailable = CARNUM;
-	
+
+
+	//initialize waiting space
+	for(int i  = 0; i < MAXWAITPEOPLE; i++){
+		waitingSpace[i] = -1;
+	}
+
+
 	for(int timestep = 0; timestep < 600; timestep++){ // 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
 
 		num_rejected = 0;
@@ -55,8 +79,15 @@ int main(int argc, char *argv[]){
 				num_passengers = num_waiting;
 			}
 			
+			// update waiting time
+			for(int i = 0; i < num_passengers; i++){
+				if(waitingSpace[i] >=0){
+					totalWaitingTime = totalWaitingTime + 1;
+				}
+			}
+
 			// Send car with thread
-			pthread_create(&tid, NULL, run_car, num_passengers;
+			pthread_create(&tid, NULL, run_car, num_passengers);
 			pthread_join(tid, NULL);
 			
 			//update num_waiting
@@ -70,13 +101,22 @@ int main(int argc, char *argv[]){
 }
 
 
+void* run_car(int num_passengers){
 
-void* runCar(int numPassengers){
-	numCarsAvailable--;
-	//do something 
-	//factor in load and ride time
-	numCarAvailable++;
+	for(int i =0; i< MAXWAITPEOPLE; i++){
+		pthread_mutex_lock(&mutex);
+		numCarsAvailable--;
+		if(leftPeople > 0){
+			waitingSpace[i] = waitingSpace[i + num_passengers]; 			
+		} else {
+			waitingSpace[i] = -1;			
+		}
+		numCarAvailable++;
+		pthread_mutex_unlock(&mutex);
+	}
+
 }
+
 
 int getMeanArrival(int timestep){
 	int meanArrival;
