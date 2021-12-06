@@ -79,15 +79,17 @@ void explorerThread() {
 			// number of people taking ride could be less than MAXPERCAR
 			// getting the min number of people to load
 			numOfPeopleRiding = peopleInWaitingArea < MAXPERCAR ? peopleInWaitingArea : MAXPERCAR;
-		}
-		for (int i = 0; i < numOfPeopleRiding; i++) {
-			totalWaitTime++;
-		}
-		// TODO: need to implement thread_run function
-		pthread_create(&tid, NULL, thread_run, (void *) (int *) malloc(sizeof(int)));
-		pthread_join(tid, NULL);
-		// number of people waiting decreases on the car takes some people on a ride
-		peopleInWaitingArea -= numOfPeopleRiding;
+
+			for (int i = 0; i < numOfPeopleRiding; i++) {
+				totalWaitTime++;
+			}
+			
+			// TODO: need to implement thread_run function
+			pthread_create(&tid, NULL, thread_run, (void *) (int *) malloc(sizeof(int)));
+			pthread_join(tid, NULL);
+			// number of people waiting decreases on the car takes some people on a ride
+			peopleInWaitingArea -= numOfPeopleRiding;
+			}
 	}
 }
 
