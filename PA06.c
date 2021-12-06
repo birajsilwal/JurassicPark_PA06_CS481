@@ -4,9 +4,6 @@
 #include <getopt.h>
 #include <time.h>
 
-int * getHourMinuteSec(int timestep);
-int getMeanArrival(int hour);
-
 int MAXPERCAR;
 int CARNUM;
 int numCarsAvailable;
@@ -56,6 +53,83 @@ void increseWaitingTime() {
 	} 
 }
 
+// this is a mock thread_run method taken from lecture
+// need to implement for explorer
+static int count = 0;
+void* thread_run(void* parm) {
+	for (int i = 0; i < 5; i++) {
+		count++;
+		printf("The thread_run method count is = %d\n", count);
+		sleep(1);
+	}
+	return NULL;
+}
+
+
+/**
+ * drive the explorer, for each explorer (CARNUM), create a new thread.
+ * each ride in explorer consists of MAXPERCAR or less people.
+ */
+void explorerThread() {
+	int numOfPeopleRiding;
+	// for each car, load the min number of people, increase 
+	// total waiting time and create a thread.
+	for (int i = 0; i < CARNUM; i++) {
+		if (peopleInWaitingArea > 0) {
+			// number of people taking ride could be less than MAXPERCAR
+			// getting the min number of people to load
+			numOfPeopleRiding = peopleInWaitingArea < MAXPERCAR ? peopleInWaitingArea : MAXPERCAR;
+		}
+		for (int i = 0; i < numOfPeopleRiding; i++) {
+			totalWaitTime++;
+		}
+		// TODO: need to implement thread_run function
+		pthread_create(&tid, NULL, thread_run, (void *) (int *) malloc(sizeof(int)));
+		pthread_join(tid, NULL);
+		// number of people waiting decreases on the car takes some people on a ride
+		peopleInWaitingArea -= numOfPeopleRiding;
+	}
+}
+
+
+void* runCar(int numPassengers){
+	numCarsAvailable--;
+	//do something 
+	//factor in load and ride time
+	numCarsAvailable++;
+}
+
+int * getHourMinuteSec(int timestep){
+
+	int hours;
+	int minutes;
+	int seconds;
+//	int hoursMinsSecs[3];
+
+  hours = timestep / 60; 
+  minutes = timestep % 60; 
+  seconds = 0;
+        
+  int hoursMinsSecs[3] = {hours, minutes, seconds};
+        
+  return hoursMinsSecs;
+
+}
+
+
+void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiting){
+	
+	FILE *output_file = fopen("output.txt", "w");
+	
+	int * hoursMinsSecs;
+	
+	hoursMinsSecs = getHourMinuteSec(timestep);
+	
+	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %d:%d:%d\n", timestep, num_arrivals, num_rejected, num_waiting, hoursMinSecs[0], hoursMinsSecs[1], hoursMinsSecs[2]);
+	
+	fclose(output_file);
+
+}
 
 
 int main(int argc, char *argv[]) {
@@ -101,86 +175,5 @@ int main(int argc, char *argv[]) {
 		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
 	}
 }
-
-
-// this is a mock thread_run method taken from lecture
-// need to implement for explorer
-static int count = 0;
-void* thread_run(void* parm) {
-	for (int i = 0; i < 5; i++) {
-		count++;
-		printf("The thread_run method count is = %d\n", count);
-		sleep(1);
-	}
-	return NULL;
-}
-
-
-/**
- * drive the explorer, for each explorer (CARNUM), create a new thread.
- * each ride in explorer consists of MAXPERCAR or less people.
- */
-void explorerThread() {
-	int numOfPeopleRiding;
-	// for each car, load the min number of people, increase 
-	// total waiting time and create a thread.
-	for (int i = 0; i < CARNUM; i++) {
-		if (peopleInWaitingArea > 0) {
-			// number of people taking ride could be less than MAXPERCAR
-			// getting the min number of people to load
-			numOfPeopleRiding = peopleInWaitingArea < MAXPERCAR ? peopleInWaitingArea : MAXPERCAR;
-		}
-		for (int i = 0; i < numOfPeopleRiding; i++) {
-			totalWaitTime++;
-		}
-		// TODO: need to implement thread_run function
-		pthread_create(&tid, NULL, thread_run, (void *) (int *) malloc(sizeof(int)));
-		pthread_join(tid, NULL);
-		// number of people waiting decreases on the car takes some people on a ride
-		peopleInWaitingArea -= numOfPeopleRiding;
-	}
-}
-
-
-void* runCar(int numPassengers){
-	numCarsAvailable--;
-	//do something 
-	//factor in load and ride time
-	numCarAvailable++;
-}
-
-int * getHourMinuteSec(int timestep){
-
-	int hours;
-	int minutes;
-	int seconds;
-//	int hoursMinsSecs[3];
-
-  hours = timestep / 60; 
-  minutes = timestep % 60; 
-  seconds = 0;
-        
-  int hoursMinsSecs[3] = {hours, minutes, seconds};
-        
-  return hoursMinsSecs;
-
-}
-
-
-void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiting){
-	
-	FILE *output_file = fopen("output.txt", "w");
-	
-	hoursMinsSecs = getHourMinuteSec(timestep);
-	
-	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %d:%d:%d\n", timestep, num_arrivals, num_rejected, num_waiting, hoursMinSecs[0], hoursMinsSecs[1], hoursMinsSecs[2]);
-	
-	fclose(output_file);
-
-}
-
-
-
-
 
 
