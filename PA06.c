@@ -54,30 +54,12 @@ void initiateWaitingSpace() {
 /**
  * increases waiting time. 
  */
-void increseWaitingTime() {
+void increaseWaitingTime() {
 	for (int i = 0; i < MAXWAITPEOPLE; i++) {
 		if (waitingArea[i] == 0) {
 			waitingArea[i]++;
 		}
 	} 
-}
-
-
-void getTimeString(int timestep){
-	int * hoursMinsSecs;
-	char buffer [20];
-	
-	hoursMinsSecs = getHourMinuteSec(timestep);
-
-	timeInfo.tm_sec = hoursMinsSecs[2];
-	timeInfo.tm_min = hoursMinsSecs[1];
-	timeInfo.tm_hour = hoursMinsSecs[0];
-
-	strftime(buffer,10, "%H:%M:%S", &timeInfo);
-	for(int i =0; i<8;i++){
-		timeString[i] = buffer[i];
-	}
-	timeString[8] = '\0';
 }
 
 
@@ -100,7 +82,11 @@ void explorerThread() {
 			}
 			
 			// TODO: need to implement thread_run function
-			pthread_create(&tid, NULL, run_car, (void *) (int *) malloc(sizeof(int)));
+
+			int *passengers = (int *)malloc(sizeof(int));
+			passengers[0] = peopleInsideCar;
+
+			pthread_create(&tid, NULL, run_car, (void *)passengers);
 			pthread_join(tid, NULL);
 			// number of people waiting decreases on the car takes some people on a ride
 			peopleInWaitingArea -= numOfPeopleRiding;
@@ -143,10 +129,27 @@ int * getHourMinuteSec(int timestep){
   minutes = timestep % 60; 
   seconds = 0;
         
-  int hoursMinsSecs[3] = {hours, minutes, seconds};
+  static int hoursMinsSecs[3] = {hours, minutes, seconds};
         
   return hoursMinsSecs;
 
+}
+
+void getTimeString(int timestep){
+	int * hoursMinsSecs;
+	char buffer [20];
+	
+	hoursMinsSecs = getHourMinuteSec(timestep);
+
+	timeInfo.tm_sec = hoursMinsSecs[2];
+	timeInfo.tm_min = hoursMinsSecs[1];
+	timeInfo.tm_hour = hoursMinsSecs[0];
+
+	strftime(buffer,10, "%H:%M:%S", &timeInfo);
+	for(int i =0; i<8;i++){
+		timeString[i] = buffer[i];
+	}
+	timeString[8] = '\0';
 }
 
 
@@ -233,18 +236,17 @@ int main(int argc, char *argv[]) {
 				num_passengers = MAXPERCAR;
 			}else{
 				num_passengers = num_waiting;
+				peopleInWaitingArea = num_waiting;
 			}
 			
 			// update waiting time
 			totalWaitingTime += (7 * num_passengers);
 
 			// Send car with thread
-			pthread_create(&tid, NULL, run_car, num_passengers);
-			pthread_join(tid, NULL);
+			explorerThread();
 			
 			//update num_waiting
 			num_waiting -= num_passengers;
-			
 		}
 		
 	}
