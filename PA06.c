@@ -13,6 +13,9 @@ int numCarsAvailable;
 const int MAXWAITPEOPLE = 800;
 const int LOADING_TIME = 7;
 int waitingArea[MAXWAITPEOPLE];
+int peopleInWaitingArea = 0;
+int totalWaitTime = 0;
+pthread_t tid;
 
 /** 
  * @param int hour
@@ -55,19 +58,15 @@ void increseWaitingTime() {
 
 
 int main(int argc, char *argv[]) {
-
-	int carnum;
-	int maxpercar;
 	int opt;
-
 	// handling user command line argument using getopt
   while((opt = getopt(argc, argv, "N:M:")) != -1) {
     switch(opt){
       case 'N':
-        carnum = atoi(optarg);
+        CARNUM = atoi(optarg);
         break;
       case 'M':
-        maxpercar = atoi(optarg);
+        MAXPERCAR = atoi(optarg);
         break;
       default:
         printf("Incorrect Flags\n");
@@ -122,6 +121,43 @@ int main(int argc, char *argv[]) {
     
 }
 
+// this is a mock thread_run method taken from lecture
+// need to implement for explorer
+static int count = 0;
+void* thread_run(void* parm) {
+	for (int i = 0; i < 5; i++) {
+		count++;
+		printf("The thread_run method count is = %d\n", count);
+		sleep(1);
+	}
+	return NULL;
+}
+
+
+/**
+ * drive the explorer, for each explorer (CARNUM), create a new thread.
+ * each ride in explorer consists of MAXPERCAR or less people.
+ */
+void explorerThread() {
+	int numOfPeopleRiding;
+	// for each car, load the min number of people, increase 
+	// total waiting time and create a thread.
+	for (int i = 0; i < CARNUM; i++) {
+		if (peopleInWaitingArea > 0) {
+			// number of people taking ride could be less than MAXPERCAR
+			// getting the min number of people to load
+			numOfPeopleRiding = peopleInWaitingArea < MAXPERCAR ? peopleInWaitingArea : MAXPERCAR;
+		}
+		for (int i = 0; i < numOfPeopleRiding; i++) {
+			totalWaitTime++;
+		}
+		// TODO: need to implement thread_run function
+		pthread_create(&tid, NULL, thread_run, (void *) (int *) malloc(sizeof(int)));
+		pthread_join(tid, NULL);
+		// number of people waiting decreases on the car takes some people on a ride
+		peopleInWaitingArea -= numOfPeopleRiding;
+	}
+}
 
 
 void* runCar(int numPassengers){
