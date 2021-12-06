@@ -63,6 +63,30 @@ void increaseWaitingTime() {
 }
 
 
+void* run_car(void* numPassengers){
+
+	int * num_passengers = (int *) num_passengers;
+	int leftPeople = num_passengers[0];
+
+	for(int i =0; i< MAXWAITPEOPLE; i++){
+		pthread_mutex_lock(&mutex);
+		numCarsAvailable--;
+		if(leftPeople > 0){
+			waitingArea[i] = waitingArea[i + leftPeople]; 			
+		} else {
+			waitingArea[i] = -1;			
+		}
+		numCarsAvailable++;
+		pthread_mutex_unlock(&mutex);
+		leftPeople--;
+	}
+
+	pthread_mutex_lock(&mutex);
+	totalWaitingTime += 53;
+	pthread_mutex_unlock(&mutex);
+
+}
+
 /**
  * drive the explorer, for each explorer (CARNUM), create a new thread.
  * each ride in explorer consists of MAXPERCAR or less people.
@@ -84,7 +108,7 @@ void explorerThread() {
 			// TODO: need to implement thread_run function
 
 			int *passengers = (int *)malloc(sizeof(int));
-			passengers[0] = peopleInsideCar;
+			passengers[0] = numOfPeopleRiding;
 
 			pthread_create(&tid, NULL, run_car, (void *)passengers);
 			pthread_join(tid, NULL);
@@ -95,41 +119,20 @@ void explorerThread() {
 }
 
 
-void* run_car(int num_passengers){
-
-	int leftPeople = num_passengers;
-
-	for(int i =0; i< MAXWAITPEOPLE; i++){
-		pthread_mutex_lock(&mutex);
-		numCarsAvailable--;
-		if(leftPeople > 0){
-			waitingArea[i] = waitingArea[i + num_passengers]; 			
-		} else {
-			waitingArea[i] = -1;			
-		}
-		numCarsAvailable++;
-		pthread_mutex_unlock(&mutex);
-		leftPeople--;
-	}
-
-	pthread_mutex_lock(&mutex);
-	totalWaitingTime += 53;
-	pthread_mutex_unlock(&mutex);
-
-}
-
-
 int * getHourMinuteSec(int timestep){
 
 	int hours;
 	int minutes;
 	int seconds;
+	static int hoursMinsSecs[3];
 
   hours = timestep / 60; 
   minutes = timestep % 60; 
   seconds = 0;
         
-  static int hoursMinsSecs[3] = {hours, minutes, seconds};
+  hoursMinsSecs[0] = hours;
+  hoursMinsSecs[1] = minutes;
+  hoursMinsSecs[2] = seconds;
         
   return hoursMinsSecs;
 
@@ -215,7 +218,7 @@ int main(int argc, char *argv[]) {
 	for(int timestep = 0; timestep < 600; timestep++) { 
 
 		num_rejected = 0;
-		num_arrivals = getMeanArrival(timestep);
+		num_arrivals = getArrivals(timestep);
 		num_waiting += num_arrivals;
 		
 		if(num_waiting > MAXWAITPEOPLE){
