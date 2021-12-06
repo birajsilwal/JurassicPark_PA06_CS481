@@ -16,12 +16,12 @@ int totalArrived ;
 int totalRejected;
 int totalWaited;
 char timeString[10];
-
 pthread_mutex_t mutex;
-
+struct tm timeInfo ={0};
 
 void getTimeString(int timestep){
-	hoursMinsSecs = getHourMinuteSec(timestep);
+	int hoursMinsSecs [3] = getHourMinuteSec(timestep);
+	char buffer [20];
 	
 	timeInfo.tm_sec = hoursMinsSecs[2];
 	timeInfo.tm_min = hoursMinsSecs[1];
@@ -148,13 +148,12 @@ int * getHourMinuteSec(int timestep){
 	int hours;
 	int minutes;
 	int seconds;
-	int hoursMinsSecs[3];
 
         hours = timestep / 60; 
         minutes = timestep % 60; 
         seconds = 0;
         
-        hoursMinsSecs = {hours, minutes seconds};
+        	int hoursMinsSecs[3] = {hours, minutes, seconds};
         
         return hoursMinsSecs;
 
