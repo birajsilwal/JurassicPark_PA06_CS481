@@ -11,7 +11,11 @@ int CARNUM;
 int numCarsAvailable;
 const int MAXWAITPEOPLE = 800;
 int waitingSpace[800];
-int totalWaitingTime = 0;
+int totalWaitingTime;
+int totalArrived ;
+int totalRejected;
+int totalWaited;
+
 pthread_mutex_t mutex;
 
 
@@ -47,6 +51,10 @@ int main(int argc, char *argv[]){
 	int num_passengers;
 	
 	numCarsAvailable = CARNUM;
+	totalWaitingTime = 0; 
+	totalArrived = 0;
+	totalRejected = 0;
+	totalWaited = 0;
 
 
 	//initialize waiting space
@@ -66,6 +74,10 @@ int main(int argc, char *argv[]){
 			num_waiting = MAXWAITPEOPLE;
 		}
 		
+		totalRejected += num_rejected;
+		totalArrived += num_arrivals;
+		totalWaited += num_waiting;
+
 		//write to file
 		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
 		
@@ -80,11 +92,7 @@ int main(int argc, char *argv[]){
 			}
 			
 			// update waiting time
-			for(int i = 0; i < num_passengers; i++){
-				if(waitingSpace[i] >=0){
-					totalWaitingTime = totalWaitingTime + 1;
-				}
-			}
+			totalWaitingTime += (7 * num_passengers);
 
 			// Send car with thread
 			pthread_create(&tid, NULL, run_car, num_passengers);
@@ -96,6 +104,11 @@ int main(int argc, char *argv[]){
 		}
 		
 	}
+
+	printf("Total Number Arrived: %d", totalArrived);
+	printf("Total Number Rejected: %d", totalRejected);
+	printf("Total Number in Line: %d", totalWaited);
+	printf("Average Waiting Time: %d Minutes", (totalWaitingTime / totalWaited) / 60);
 
     
 }
