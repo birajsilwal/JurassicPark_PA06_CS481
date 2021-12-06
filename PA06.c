@@ -11,7 +11,7 @@ int CARNUM;
 int numCarsAvailable;
 const int MAXWAITPEOPLE = 800;
 int waitingSpace[800];
-int totalWaitingTime;
+int totalWaitingTime; // in seconds
 int totalArrived ;
 int totalRejected;
 int totalWaited;
@@ -126,6 +126,10 @@ void* run_car(int num_passengers){
 		pthread_mutex_unlock(&mutex);
 		leftPeople--;
 	}
+
+	pthread_mutex_lock(&mutex);
+	totalWaitingTime += 53;
+	pthread_mutex_unlock(&mutex);
 
 }
 
