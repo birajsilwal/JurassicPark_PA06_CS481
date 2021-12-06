@@ -112,6 +112,8 @@ int main(int argc, char *argv[]){
 
 void* run_car(int num_passengers){
 
+	int leftPeople = num_passengers;
+
 	for(int i =0; i< MAXWAITPEOPLE; i++){
 		pthread_mutex_lock(&mutex);
 		numCarsAvailable--;
@@ -122,6 +124,7 @@ void* run_car(int num_passengers){
 		}
 		numCarAvailable++;
 		pthread_mutex_unlock(&mutex);
+		leftPeople--;
 	}
 
 }
