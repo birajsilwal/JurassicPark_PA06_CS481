@@ -3,11 +3,12 @@
 #include <sys/types.h>
 #include <time.h>
 
-int * getHourMinuteSec(long startTime, long currentTime);
+int * getHourMinuteSec(int timestep);
 int getMeanArrival(int hour);
 
 int MAXPERCAR;
 int CARNUM;
+int numCarsAvailable;
 const int MAXWAITPEOPLE = 800;
 
 
@@ -24,21 +25,44 @@ int main(int argc, char *argv[]){
 	pthread_t tid;
 	int hours, minutes, seconds;
 	int hoursMinutesSecs[3];
-	int meanArrival;
-	int 
+	int meanArrival;	
+	char timestamp[8];
+	int num_passengers;
 	
-	time(&startTime);
+	numCarsAvailable = CARNUM;
 	
-	while(startTime - currentTime <= 6){ // 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
-		time(&currentTime);
-		hoursMinutesSecs = getHourMinuteSec(startTime, currentTime);
-		hours = hoursMinutesSecs[0];
-		minutes = hoursMinutesSecs[1];
-		seconds = hoursMinutesSecs[2];
+	for(int timestep = 0; timestep < 600; timestep++){ // 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
+
+		num_rejected = 0;
+		num_arrivals = getMeanArrival(hour);
+		num_waiting += num_arrivals;
 		
-		meanArrival = getMeanArrival(hour);
+		if(num_waiting > MAXWAITPEOPLE){
+			num_rejected = num_waiting - MAXWAITPEOPLE;
+			num_waiting = MAXWAITPEOPLE;
+		}
+		
+		//write to file
+		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
 		
 		
+		
+		if(numCarsAvailable != 0){
+			
+			if(num_waiting > MAXPERCAR){
+				num_passengers = MAXPERCAR;
+			}else{
+				num_passengers = num_waiting;
+			}
+			
+			// Send car with thread
+			pthread_create(&tid, NULL, run_car, num_passengers;
+			pthread_join(tid, NULL);
+			
+			//update num_waiting
+			num_waiting -= num_passengers;
+			
+		}
 		
 	}
 
@@ -46,28 +70,15 @@ int main(int argc, char *argv[]){
 }
 
 
-int * getHourMinuteSec(long startTime, long currentTime){
-	float time_passed;
-	long totalMinutes;
-	int hours;
-	int minutes;
-	int seconds;
-	int hoursMinsSecs[3];
-	
-	time_passed = startTime - currentTime;
-	totalMinutes = (time_passed * 1000) / 10; //convert to milliseconds and then convert to minutes
-        hours = totalMinutes / 60; 
-        minutes = totalMinutes % 60; 
-        seconds = 0;
-        
-        hoursMinsSecs = {hours, minutes seconds};
-        
-        return hoursMinsSecs;
 
+void* runCar(int numPassengers){
+	numCarsAvailable--;
+	//do something 
+	//factor in load and ride time
+	numCarAvailable++;
 }
 
-
-int genArrivals(int timestep){
+int getMeanArrival(int timestep){
 	int meanArrival;
 	
 	if(timestep < 119){
@@ -82,3 +93,39 @@ int genArrivals(int timestep){
 	
 	return poissonRandom(meanArrival);
 }
+
+int * getHourMinuteSec(int timestep){
+
+	int hours;
+	int minutes;
+	int seconds;
+	int hoursMinsSecs[3];
+
+        hours = timestep / 60; 
+        minutes = timestep % 60; 
+        seconds = 0;
+        
+        hoursMinsSecs = {hours, minutes seconds};
+        
+        return hoursMinsSecs;
+
+}
+
+
+void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiting){
+	
+	FILE *output_file = fopen("output.txt", "w");
+	
+	hoursMinsSecs = getHourMinuteSec(timestep);
+	
+	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %d:%d:%d\n", timestep, num_arrivals, num_rejected, num_waiting, hoursMinSecs[0], hoursMinsSecs[1], hoursMinsSecs[2]);
+	
+	fclose(output_file);
+
+}
+
+
+
+
+
+
