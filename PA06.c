@@ -12,7 +12,7 @@ int CARNUM;
 int numCarsAvailable;
 const int MAXWAITPEOPLE = 800;
 const int LOADING_TIME = 7;
-int waitingArea[MAXWAITPEOPLE];
+int * waitingArea;
 int peopleInWaitingArea = 0;
 int totalWaitTime = 0;
 pthread_t tid;
@@ -43,6 +43,7 @@ void initiateWaitingArea() {
 		waitingArea[i] = 0;
 	}
 }	
+
 
 /**
  * increases waiting time. 
@@ -79,6 +80,11 @@ int main(int argc, char *argv[]) {
 	int meanArrival;	
 	char timestamp[8];
 	int num_passengers;
+	int num_rejected;
+	int num_arrivals;
+	int num_waiting;
+	
+	waitingArea = (int *)malloc(MAXWAITPEOPLE);
 	
 	for(int timestep = 0; timestep < 600; timestep++){ // 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
 
