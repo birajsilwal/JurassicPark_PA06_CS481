@@ -74,14 +74,11 @@ int main(int argc, char *argv[]) {
     }
   }
 	
-	pthread_t tid;
 	int hours, minutes, seconds;
 	int hoursMinutesSecs[3];
 	int meanArrival;	
 	char timestamp[8];
 	int num_passengers;
-	
-	numCarsAvailable = CARNUM;
 	
 	for(int timestep = 0; timestep < 600; timestep++){ // 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
 
@@ -96,30 +93,9 @@ int main(int argc, char *argv[]) {
 		
 		//write to file
 		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
-		
-		
-		
-		if(numCarsAvailable != 0){
-			
-			if(num_waiting > MAXPERCAR){
-				num_passengers = MAXPERCAR;
-			}else{
-				num_passengers = num_waiting;
-			}
-			
-			// Send car with thread
-			pthread_create(&tid, NULL, run_car, num_passengers;
-			pthread_join(tid, NULL);
-			
-			//update num_waiting
-			num_waiting -= num_passengers;
-			
-		}
-		
 	}
-
-    
 }
+
 
 // this is a mock thread_run method taken from lecture
 // need to implement for explorer
