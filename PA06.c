@@ -15,19 +15,17 @@ int totalWaitingTime;
 int totalArrived ;
 int totalRejected;
 int totalWaited;
+char timeString[10];
 
 pthread_mutex_t mutex;
 
 
-void getTimeString(int currentTime){
+void getTimeString(int timestep){
+	hoursMinsSecs = getHourMinuteSec(timestep);
 	
-	sec = 0;
-	min = currentTime % 60;
-	hr = 9 + currentTime/60;
-	
-	timeInfo.tm_sec = sec;
-	timeInfo.tm_min = min;
-	timeInfo.tm_hour = hr;
+	timeInfo.tm_sec = hoursMinsSecs[2];
+	timeInfo.tm_min = hoursMinsSecs[1];
+	timeInfo.tm_hour = hoursMinsSecs[0];
 
 	strftime(buffer,10, "%H:%M:%S", &timeInfo);
 	for(int i =0; i<8;i++){
@@ -79,9 +77,7 @@ int main(int argc, char *argv[]){
 		totalWaited += num_waiting;
 
 		//write to file
-		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
-		
-		
+		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);	
 		
 		if(numCarsAvailable != 0){
 			
@@ -169,9 +165,9 @@ void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiti
 	
 	FILE *output_file = fopen("output.txt", "w");
 	
-	hoursMinsSecs = getHourMinuteSec(timestep);
+	getTimeString;
 	
-	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %d:%d:%d\n", timestep, num_arrivals, num_rejected, num_waiting, hoursMinSecs[0], hoursMinsSecs[1], hoursMinsSecs[2]);
+	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %s\n", timestep, num_arrivals, num_rejected, num_waiting, timeString);
 	
 	fclose(output_file);
 
