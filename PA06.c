@@ -12,7 +12,7 @@ const int LOADING_TIME = 7;
 int peopleInWaitingArea = 0;
 int totalWaitTime = 0;
 int waitingArea[800];
-int totalWaitingTime; // in seconds
+double totalWaitingTime; // in seconds
 int totalArrived ;
 int totalRejected;
 int totalWaited;
@@ -38,7 +38,7 @@ int getArrivals(int timestep){
 	else { meanArrival = 25; }
 	
 	// return poissonRandom(meanArrival);
-	return 0;
+	return poissonRandom(meanArrival);
 }
 
 /**
@@ -103,7 +103,7 @@ void explorerThread() {
 			numOfPeopleRiding = peopleInWaitingArea < MAXPERCAR ? peopleInWaitingArea : MAXPERCAR;
 
 			for (int i = 0; i < numOfPeopleRiding; i++) {
-				totalWaitTime++;
+				totalWaitTime += 52;
 			}
 			
 			// TODO: need to implement thread_run function
@@ -185,11 +185,10 @@ int main(int argc, char *argv[]) {
 	int meanArrival;	
 	char timestamp[8];
 	int num_passengers;
-	int num_rejected;
-	int num_arrivals;
-	int num_waiting;
+	int num_rejected = 0;
+	int num_arrivals = 0;
+	int num_waiting = 0;
 	
-	numCarsAvailable = CARNUM;
 	totalWaitingTime = 0; 
 	totalArrived = 0;
 	totalRejected = 0;
@@ -213,6 +212,7 @@ int main(int argc, char *argv[]) {
 	FILE *output_file = fopen("output.txt", "w");
 	//initialize waiting space
 	initiateWaitingSpace();
+	numCarsAvailable = CARNUM;
 
 	
 
@@ -221,6 +221,7 @@ int main(int argc, char *argv[]) {
 
 		num_rejected = 0;
 		num_arrivals = getArrivals(timestep);
+		//printf("num_arrivals: %d", num_arrivals);
 		num_waiting += num_arrivals;
 		
 		if(num_waiting > MAXWAITPEOPLE){
@@ -232,7 +233,10 @@ int main(int argc, char *argv[]) {
 		totalArrived += num_arrivals;
 		totalWaited += num_waiting;
 
-		printf("Hello, World!");
+		//printf("TimeString: %s  ", timeString );
+		//printf("Num Waiting: %d  ", num_waiting);
+
+		//printf("Hello, World!");
 		//write to file
 		// writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
 		fprintf(output_file, "%d arrive %d reject %d wait-line %d at %s\n", timestep, num_arrivals, num_rejected, num_waiting, timeString);
@@ -247,7 +251,8 @@ int main(int argc, char *argv[]) {
 			}
 			
 			// update waiting time
-			totalWaitingTime += (7 * num_passengers);
+		//	printf("update total waiting time\n ");
+			totalWaitingTime += (float) (7 * num_passengers);
 
 			// Send car with thread
 			explorerThread();
@@ -261,7 +266,8 @@ int main(int argc, char *argv[]) {
 	printf("Total Number Arrived: %d. ", totalArrived);
 	printf("Total Number Rejected: %d. ", totalRejected);
 	printf("Total Number in Line: %d. ", totalWaited);
-	printf("Average Waiting Time: %d Minutes.\n", (totalWaitingTime / totalWaited) / 60);
+	printf("Total Waiting Time: %.2lf ", totalWaitingTime);
+	printf("Average Waiting Time: %.2lf Minutes.\n", ( totalWaitingTime / (float) totalWaited) / 60);
 
     
 }
