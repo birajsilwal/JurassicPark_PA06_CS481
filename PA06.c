@@ -1,3 +1,14 @@
+/**
+ * @file PA06.c
+ * @author Pena, Bethany; Silwal, Biraj
+ * @brief 
+ * @version 0.1
+ * @date 2021-12-06
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "random437.h"
 #include <pthread.h>
 #include <sys/types.h>
@@ -37,7 +48,6 @@ int getArrivals(int timestep){
 	else if(timestep >= 300 && timestep < 420) { meanArrival = 35; }
 	else { meanArrival = 25; }
 	
-	// return poissonRandom(meanArrival);
 	return poissonRandom(meanArrival);
 }
 
@@ -105,8 +115,6 @@ void explorerThread() {
 			for (int i = 0; i < numOfPeopleRiding; i++) {
 				totalWaitTime += 52;
 			}
-			
-			// TODO: need to implement thread_run function
 
 			int *passengers = (int *)malloc(sizeof(int));
 			passengers[0] = numOfPeopleRiding;
@@ -158,9 +166,7 @@ void getTimeString(int timestep){
 
 
 void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiting){
-	
 	FILE *output_file = fopen("output.txt", "w");
-	
 	int * hoursMinsSecs;
 	
 	hoursMinsSecs = getHourMinuteSec(timestep);
@@ -168,15 +174,8 @@ void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiti
 	
 	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %s\n", timestep, num_arrivals, num_rejected, num_waiting, timeString);
 	fclose(output_file);
-
 }
 
-
-// int main(int argc, char *argv[]) {
-	
-// 	waitingArea = (int *)malloc(MAXWAITPEOPLE);
-	
-// 	for(int timestep = 0; timestep < 600; timestep++){ // 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
 
 int main(int argc, char *argv[]) {
 	
@@ -209,13 +208,14 @@ int main(int argc, char *argv[]) {
         return(-1);
     }
   }
+
+	// create a new instance of output file
 	FILE *output_file = fopen("output.txt", "w");
 	//initialize waiting space
 	initiateWaitingSpace();
 	numCarsAvailable = CARNUM;
 
 	
-
 	// 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
 	for(int timestep = 0; timestep < 600; timestep++) { 
 
@@ -233,11 +233,8 @@ int main(int argc, char *argv[]) {
 		totalArrived += num_arrivals;
 		totalWaited += num_waiting;
 
-		//printf("TimeString: %s  ", timeString );
-		//printf("Num Waiting: %d  ", num_waiting);
-
-		//printf("Hello, World!");
-		//write to file
+		// write into the file,
+		// don't need to call writeToFile function
 		// writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
 		fprintf(output_file, "%d arrive %d reject %d wait-line %d at %s\n", timestep, num_arrivals, num_rejected, num_waiting, timeString);
 		
@@ -263,18 +260,10 @@ int main(int argc, char *argv[]) {
 		
 	}
 
+	// final result to disply
 	printf("Total Number Arrived: %d. ", totalArrived);
 	printf("Total Number Rejected: %d. ", totalRejected);
 	printf("Total Number in Line: %d. ", totalWaited);
 	printf("Total Waiting Time: %.2lf ", totalWaitingTime);
 	printf("Average Waiting Time: %.2lf Minutes.\n", ( totalWaitingTime / (float) totalWaited) / 60);
-
-    
 }
-
-
-
-
-
-
-
