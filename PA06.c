@@ -37,7 +37,8 @@ int getArrivals(int timestep){
 	else if(timestep >= 300 && timestep < 420) { meanArrival = 35; }
 	else { meanArrival = 25; }
 	
-	return poissonRandom(meanArrival);
+	// return poissonRandom(meanArrival);
+	return 0;
 }
 
 /**
@@ -166,7 +167,6 @@ void writeToFile(int timestep, int num_rejected, int num_arrivals, int num_waiti
 	getTimeString;
 	
 	fprintf(output_file, "%d arrive %d reject %d wait-line %d at %s\n", timestep, num_arrivals, num_rejected, num_waiting, timeString);
-	
 	fclose(output_file);
 
 }
@@ -210,9 +210,11 @@ int main(int argc, char *argv[]) {
         return(-1);
     }
   }
-	
+	FILE *output_file = fopen("output.txt", "w");
 	//initialize waiting space
 	initiateWaitingSpace();
+
+	
 
 	// 600 minutes = 6000ms == 6 seconds (1 min = 10 ms) -> (1 sec = 0.167 ms)
 	for(int timestep = 0; timestep < 600; timestep++) { 
@@ -230,8 +232,10 @@ int main(int argc, char *argv[]) {
 		totalArrived += num_arrivals;
 		totalWaited += num_waiting;
 
+		printf("Hello, World!");
 		//write to file
-		writeToFile(timestep, num_rejected, num_arrivals, num_waiting);	
+		// writeToFile(timestep, num_rejected, num_arrivals, num_waiting);
+		fprintf(output_file, "%d arrive %d reject %d wait-line %d at %s\n", timestep, num_arrivals, num_rejected, num_waiting, timeString);
 		
 		if(numCarsAvailable != 0){
 			
@@ -254,10 +258,10 @@ int main(int argc, char *argv[]) {
 		
 	}
 
-	printf("Total Number Arrived: %d", totalArrived);
-	printf("Total Number Rejected: %d", totalRejected);
-	printf("Total Number in Line: %d", totalWaited);
-	printf("Average Waiting Time: %d Minutes", (totalWaitingTime / totalWaited) / 60);
+	printf("Total Number Arrived: %d. ", totalArrived);
+	printf("Total Number Rejected: %d. ", totalRejected);
+	printf("Total Number in Line: %d. ", totalWaited);
+	printf("Average Waiting Time: %d Minutes.\n", (totalWaitingTime / totalWaited) / 60);
 
     
 }
